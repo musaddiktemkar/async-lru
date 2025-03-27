@@ -6,6 +6,7 @@
     "outDir": "./dist/cjs",
     "declaration": true,
     "declarationDir": "./dist",
+    "composite": true,
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
