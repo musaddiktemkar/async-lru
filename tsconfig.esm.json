@@ -4,6 +4,7 @@
     "target": "ES6",
     "lib": ["ES2018"],
     "outDir": "./dist/esm",
+    "rootDir": "./src",
     "declaration": true,
     "declarationDir": "./dist",
     "composite": true,
