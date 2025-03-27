@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "ES6", // You can use ES2020 or later if needed
+    "outDir": "./dist/cjs",
+    "declaration": true, // Generates type declarations
+    "declarationDir": "./dist", // Unifies declaration files
+    "strict": true, // Enables strict type checking
+    "moduleResolution": "node", // Resolves modules properly for Node.js
+    "esModuleInterop": true, // Allows interoperation with ES Modules
+    "skipLibCheck": true // Skips type checking of library files
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
