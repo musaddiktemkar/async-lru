@@ -1,0 +1,45 @@
+{
+  "name": "async-lru-cache",
+  "version": "1.0.0",
+  "description": "An efficient asynchronous LRU (Least Recently Used) caching solution supporting CommonJS and ES Modules.",
+  "main": "dist/cjs/main-cjs.js",
+  "module": "dist/esm/main-esm.js",
+  "types": "dist/main-esm.d.ts",
+  "exports": {
+    "require": "./dist/cjs/main-cjs.js",
+    "import": "./dist/esm/main-esm.js"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node test.cjs.js && node test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/musaddiktemkar/async-lru-cache.git"
+  },
+  "keywords": [
+    "cache",
+    "async",
+    "LRU",
+    "performance",
+    "typescript",
+    "node",
+    "CommonJS",
+    "ESM",
+    "npm"
+  ],
+  "author": "Musaddik Temkar <musaddiknpm@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/musaddiktemkar/async-lru-cache/issues"
+  },
+  "homepage": "https://github.com/musaddiktemkar/async-lru-cache#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
