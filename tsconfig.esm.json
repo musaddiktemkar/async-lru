@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "module": "ESNext",
-    "target": "ES6", // Or higher versions like ES2020 or ESNext
+    "target": "ES6",
     "outDir": "./dist/esm",
-    "declaration": true, // Generates type declarations
-    "declarationDir": "./dist", // Unifies declaration files
-    "strict": true, // Enables strict type checking
-    "moduleResolution": "node", // Resolves modules properly for Node.js
-    "esModuleInterop": true, // Allows interoperation with CommonJS modules
-    "skipLibCheck": true // Skips type checking of library files
+    "declaration": true,
+    "declarationDir": "./dist",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
