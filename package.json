@@ -9,7 +9,6 @@
     "require": "./dist/cjs/main-cjs.js",
     "import": "./dist/esm/main-esm.js"
   },
-  "type": "module",
   "files": [
     "dist/",
     "README.md"
