@@ -8,7 +8,6 @@
     "declaration": true,
     "declarationMap": false,
     "declarationDir": "./dist",
-    "composite": true,
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
