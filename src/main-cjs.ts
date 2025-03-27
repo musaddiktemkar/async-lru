@@ -163,4 +163,4 @@ class AsyncLRUCache<K, V> {
 }
 
 // Export for CommonJS
-export = AsyncLRUCache;
+module.exports = AsyncLRUCache;
