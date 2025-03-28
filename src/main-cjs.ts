@@ -69,26 +69,29 @@ class AsyncLRUCache<K, V> {
   }
 
   async set(key: K, value: V): Promise<void> {
-    if (key === null || key === undefined) {
-      throw new Error("Key must not be null or undefined");
-    }
+  if (key === null || key === undefined) {
+    throw new Error("Key must not be null or undefined");
+  }
 
-    const existingNode = this.cache.get(key);
+  const existingNode = this.cache.get(key);
 
-    if (existingNode) {
-      existingNode.value = value;
-      if (this.head !== existingNode) this.moveToHead(existingNode);
-    } else {
-      const newNode = new DoublyLinkedNode(key, value);
-      this.cache.set(key, newNode);
-      this.moveToHead(newNode);
+  if (existingNode) {
+    existingNode.value = value;
+    if (this.head !== existingNode) this.moveToHead(existingNode);
+  } else {
+    const newNode = new DoublyLinkedNode(key, value);
+    this.cache.set(key, newNode);
+    this.moveToHead(newNode);
 
-      if (this.cache.size > this.maxSize) {
+    if (this.cache.size > this.maxSize) {
+      const evictCount = Math.ceil(this.maxSize * 0.1); // Calculate 10% of maxSize
+      for (let i = 0; i < evictCount && this.cache.size > this.maxSize; i++) {
         const tailNode = this.removeTail();
         if (tailNode) this.cache.delete(tailNode.key);
       }
     }
   }
+}
 
   async delete(key: K): Promise<boolean> {
     if (key === null || key === undefined) {
@@ -125,23 +128,25 @@ class AsyncLRUCache<K, V> {
   }
 
   async setMaxKeys(newMaxSize: number): Promise<void> {
-    if (!Number.isFinite(newMaxSize) || newMaxSize <= 0) {
-        throw new Error("newMaxSize must be a positive number greater than 0");
+  if (!Number.isFinite(newMaxSize) || newMaxSize <= 0) {
+    throw new Error("newMaxSize must be a positive number greater than 0");
+  }
+
+  const roundedMaxSize = Math.round(newMaxSize / 10) * 10;
+  this.maxSize = roundedMaxSize;
+
+  console.log(`maxSize has been updated and rounded to: ${this.maxSize}`);
+
+  // Evict items in batches of 10% if the current cache size exceeds the new maxSize
+  while (this.cache.size > this.maxSize) {
+    const evictCount = Math.ceil(this.maxSize * 0.1); // Calculate 10% of maxSize
+    for (let i = 0; i < evictCount && this.cache.size > this.maxSize; i++) {
+      const tailNode = this.removeTail();
+      if (tailNode) {
+        this.cache.delete(tailNode.key);
+      }
     }
-
-    // Round the max size to the nearest multiple of 10
-    const roundedMaxSize = Math.round(newMaxSize / 10) * 10;
-    this.maxSize = roundedMaxSize; // Update maxSize dynamically
-
-    console.log(`maxSize has been updated and rounded to: ${this.maxSize}`);
-
-    // Evict items if the current cache size exceeds the new maxSize
-    while (this.cache.size > this.maxSize) {
-        const tailNode = this.removeTail();
-        if (tailNode) {
-            this.cache.delete(tailNode.key);
-        }
-    }
+  }
   }
 
   async *keys(): AsyncIterableIterator<K> {
