@@ -17,12 +17,13 @@ class AsyncLRUCache<K, V> {
   private tail: DoublyLinkedNode<K, V> | null = null;
 
   constructor(maxSize: number = 10000) {
-    if (!Number.isInteger(maxSize) || maxSize <= 0) {
-      throw new Error("maxSize must be a positive integer greater than 0");
-    }
+  if (!Number.isInteger(maxSize) || maxSize <= 0) {
+    throw new Error("maxSize must be a positive integer greater than 0");
+  }
 
-    this.maxSize = maxSize;
-    this.cache = new Map();
+  this.maxSize = maxSize;
+  this.cache = new Map();
+  this.currentSize = 0; // Initialize size tracker
   }
 
   private moveToHead(node: DoublyLinkedNode<K, V>): void {
@@ -83,19 +84,25 @@ class AsyncLRUCache<K, V> {
     const newNode = new DoublyLinkedNode(key, value);
     this.cache.set(key, newNode);
     this.moveToHead(newNode);
+    this.currentSize++; // Increment size
 
-    // Evict batch if size exceeds maxSize
-    while (this.cache.size > this.maxSize) {
-      const tailNode = this.removeTail();
-      if (tailNode) {
-        const deleted = await this.delete(tailNode.key);
-        if (!deleted) {
-          console.log(`Failed to delete key: ${tailNode.key}`);
+    if (this.currentSize > this.maxSize) {
+      const evictCount = Math.ceil(this.maxSize * 0.1);
+      console.log(`Evicting ${evictCount} items from cache...`);
+
+      let evicted = 0;
+      while (this.currentSize > this.maxSize && evicted < evictCount) {
+        const tailNode = this.removeTail();
+        if (tailNode && this.cache.delete(tailNode.key)) {
+          this.currentSize--; // Decrement size
+          evicted++;
+          console.log(`Evicted key: ${tailNode.key}. Current size: ${this.currentSize}`);
         }
       }
     }
   }
   }
+  
 
   async setMaxKeys(newMaxSize: number): Promise<void> {
   if (!Number.isFinite(newMaxSize) || newMaxSize <= 0) {
@@ -116,7 +123,6 @@ class AsyncLRUCache<K, V> {
     }
   }
   }
-  
 
   async delete(key: K): Promise<boolean> {
   if (key === null || key === undefined) {
@@ -126,29 +132,29 @@ class AsyncLRUCache<K, V> {
   const node = this.cache.get(key);
   if (!node) return false;
 
-  // Remove node from doubly linked list
   if (node.prev) node.prev.next = node.next;
   if (node.next) node.next.prev = node.prev;
 
-  // Handle head and tail updates
   if (node === this.head) this.head = node.next;
   if (node === this.tail) this.tail = node.prev;
   if (node === this.head && node === this.tail) {
     this.head = null;
-    this.tail = null; // Handle single-node scenario
+    this.tail = null;
   }
 
-  // Delete from Map and confirm
-  const result = this.cache.delete(key);
-  console.log(`Deleted key: ${key}, Cache size: ${this.cache.size}`);
-  return result;
+  const deleted = this.cache.delete(key);
+  if (deleted) this.currentSize--; // Decrement size on successful deletion
+  console.log(`Deleted key: ${key}. Current size: ${this.currentSize}`);
+  return deleted;
   }
   
 
   async clear(): Promise<void> {
-    this.cache.clear();
-    this.head = null;
-    this.tail = null;
+  this.cache.clear();
+  this.head = null;
+  this.tail = null;
+  this.currentSize = 0; // Reset size tracker
+  console.log("Cache cleared. Current size:", this.currentSize);
   }
 
   async has(key: K): Promise<boolean> {
