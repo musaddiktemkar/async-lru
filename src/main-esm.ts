@@ -77,22 +77,26 @@ export default class AsyncLRUCache<K, V> {
 
   if (existingNode) {
     existingNode.value = value;
-    if (this.head !== existingNode) this.moveToHead(existingNode);
+    this.moveToHead(existingNode);
   } else {
     const newNode = new DoublyLinkedNode(key, value);
     this.cache.set(key, newNode);
     this.moveToHead(newNode);
 
     if (this.cache.size > this.maxSize) {
-      const evictCount = Math.ceil(this.maxSize * 0.1); // Calculate 10% of maxSize
+      // Calculate batch eviction size
+      const evictCount = Math.ceil(this.maxSize * 0.1);
+
+      // Remove least recently used items in batches
       for (let i = 0; i < evictCount && this.cache.size > this.maxSize; i++) {
         const tailNode = this.removeTail();
-        if (tailNode) this.cache.delete(tailNode.key);
+        if (tailNode) {
+          this.cache.delete(tailNode.key);
+        }
       }
     }
   }
   }
-  
 
   async delete(key: K): Promise<boolean> {
     if (key === null || key === undefined) {
@@ -138,9 +142,9 @@ export default class AsyncLRUCache<K, V> {
 
   console.log(`maxSize has been updated and rounded to: ${this.maxSize}`);
 
-  // Evict items in batches of 10% if the current cache size exceeds the new maxSize
+  // Evict items in batches of 10% if the cache size exceeds the new maxSize
+  const evictCount = Math.ceil(this.maxSize * 0.1);
   while (this.cache.size > this.maxSize) {
-    const evictCount = Math.ceil(this.maxSize * 0.1); // Calculate 10% of maxSize
     for (let i = 0; i < evictCount && this.cache.size > this.maxSize; i++) {
       const tailNode = this.removeTail();
       if (tailNode) {
@@ -149,7 +153,6 @@ export default class AsyncLRUCache<K, V> {
     }
   }
   }
-  
   
   async *keys(): AsyncIterableIterator<K> {
     for (let current = this.head; current !== null; current = current.next) {
