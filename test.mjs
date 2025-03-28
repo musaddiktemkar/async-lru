@@ -16,9 +16,8 @@ import AsyncLRUCache from './dist/esm/main-esm.js'; // Import the ES Module vers
   await cache.set('key11', 'value11');
   console.log('Cache size after adding key11 (and evicting 10%):', await cache.size()); // Expected: 9
 
-  // Verify eviction
   console.log('Does cache still have key1? (Expected: false):', await cache.has('key1')); // Expected: false
-  console.log('Does cache still have key2? (Expected: true):', await cache.has('key2`)); // Expected: true
+  console.log('Does cache still have key2? (Expected: true):', await cache.has('key2`));
   console.log('Does cache have key11? (Expected: true):', await cache.has('key11')); // Expected: true
 
   // Test dynamic resizing
