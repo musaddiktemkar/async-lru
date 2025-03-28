@@ -64,6 +64,7 @@ const AsyncLRUCache = require('./dist/cjs/main-cjs'); // Adjust the path as need
   console.log('Iterating over all values...');
   for await (const value of cache.values()) {
     console.log(value); // Should log the most recent 100 values
+  }
 
   console.log('Extended Tests for AsyncLRUCache Completed!');
 })();
