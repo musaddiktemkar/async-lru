@@ -28,7 +28,7 @@ npm install @musaddikt/async-lru-cache
 ```js
 const AsyncLRUCache = require('async-lru-cache');
 
-const cache = new AsyncLRUCache(100); // Initialize with maxKeySize of 100
+const cache = new AsyncLRUCache(1000); // Initialize with maxKeySize of 1000
 ```
 
 ### ES Modules:
