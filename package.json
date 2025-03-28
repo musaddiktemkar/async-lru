@@ -1,5 +1,5 @@
 {
-  "name": "async-lru-cache",
+  "name": "@musaddikt/async-lru-cache",
   "version": "1.0.0",
   "description": "An efficient asynchronous LRU (Least Recently Used) caching solution supporting CommonJS and ES Modules.",
   "main": "dist/cjs/main-cjs.js",
