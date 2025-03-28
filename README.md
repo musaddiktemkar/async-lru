@@ -19,7 +19,7 @@
 
 Install the library using npm:
 ```bash
-npm install async-lru-cache
+npm install @musaddikt/async-lru-cache
 ```
 
 ## Quick Start
