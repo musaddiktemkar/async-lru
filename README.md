@@ -6,8 +6,8 @@
 
 ## Features
 - **Asynchronous Operations:** Designed for modern asynchronous workflows.
-- **LRU Eviction:** Automatically removes the least recently used items when the cache exceeds its size limit.
-- **Dynamic Resizing:** Adjust cache size dynamically with rounded limits for consistency.
+- **LRU Eviction:** Automatically removes the least recently used items when the cache exceeds its keys size limit.
+- **Dynamic Resizing:** Adjust cache keys size dynamically with rounded limits for consistency.
 - **Custom Policies:** Create and implement your own eviction strategies (e.g., priority-based or time-to-live).
 - **Iterators:** Iterate over keys, values, and entries with native asynchronous support.
 - **Dual Compatibility:** Works with both CommonJS (`require`) and ES Modules (`import`).
@@ -28,21 +28,21 @@ npm install async-lru-cache
 ```js
 const AsyncLRUCache = require('async-lru-cache');
 
-const cache = new AsyncLRUCache(100); // Initialize with maxSize of 100
+const cache = new AsyncLRUCache(100); // Initialize with maxKeySize of 100
 ```
 
 ### ES Modules:
 ```js
 import AsyncLRUCache from 'async-lru-cache';
 
-const cache = new AsyncLRUCache(100); // Initialize with maxSize of 100
+const cache = new AsyncLRUCache(100); // Initialize with maxKeySize of 100
 ```
 
 
 ## API Reference
 
 **1.** `set(key, value)`
-Add an item to the cache. If the cache exceeds maxSize, the least recently used item is evicted.
+Add an item to the cache. If the cache exceeds `maxKeySize`, the least recently used item is evicted.
 ```js
 await cache.set('key1', 'value1');
 ```
