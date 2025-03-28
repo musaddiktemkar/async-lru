@@ -10,8 +10,7 @@
     "import": "./dist/esm/main-esm.js"
   },
   "files": [
-    "dist/",
-    "README.md"
+    "dist/"
   ],
   "scripts": {
   "build:cjs": "tsc --project tsconfig.cjs.json",
