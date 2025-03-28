@@ -15,6 +15,7 @@ class AsyncLRUCache<K, V> {
   private cache: Map<K, DoublyLinkedNode<K, V>>;
   private head: DoublyLinkedNode<K, V> | null = null;
   private tail: DoublyLinkedNode<K, V> | null = null;
+  private currentSize: number = 0;
 
   constructor(maxSize: number = 10000) {
   if (!Number.isInteger(maxSize) || maxSize <= 0) {
