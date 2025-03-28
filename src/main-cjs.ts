@@ -84,22 +84,15 @@ class AsyncLRUCache<K, V> {
     this.cache.set(key, newNode);
     this.moveToHead(newNode);
 
-    if (this.cache.size > this.maxSize) {
-      const evictCount = Math.ceil(this.maxSize * 0.1); // Calculate batch size
-      console.log(`Evicting ${evictCount} items from cache (batch size: 10%)...`);
-
-      let evicted = 0;
-      while (this.cache.size > this.maxSize && evicted < evictCount) {
-        const tailNode = this.removeTail();
-        if (tailNode && this.cache.delete(tailNode.key)) {
-          console.log(`Evicted key: ${tailNode.key}`);
-          evicted++;
-        } else {
-          console.log(`Failed to evict tail node or key not found in cache.`);
+    // Evict batch if size exceeds maxSize
+    while (this.cache.size > this.maxSize) {
+      const tailNode = this.removeTail();
+      if (tailNode) {
+        const deleted = await this.delete(tailNode.key);
+        if (!deleted) {
+          console.log(`Failed to delete key: ${tailNode.key}`);
         }
-        console.log(`Cache size post deletion: ${this.cache.size}`);
       }
-      console.log(`Evicted ${evicted} items. Final cache size: ${this.cache.size}`);
     }
   }
   }
@@ -109,45 +102,48 @@ class AsyncLRUCache<K, V> {
     throw new Error("newMaxSize must be a positive number greater than 0");
   }
 
-  const roundedMaxSize = Math.round(newMaxSize / 10) * 10;
-  this.maxSize = roundedMaxSize;
+  this.maxSize = Math.round(newMaxSize / 10) * 10;
 
-  console.log(`maxSize has been updated and rounded to: ${this.maxSize}`);
+  console.log(`maxSize updated to: ${this.maxSize}`);
 
-  const evictCount = Math.ceil(this.maxSize * 0.1);
-  console.log(`Starting batch eviction for resizing. Evicting ${evictCount} items...`);
-
-  let evicted = 0;
-  while (this.cache.size > this.maxSize && evicted < evictCount) {
+  // Evict excess nodes
+  while (this.cache.size > this.maxSize) {
     const tailNode = this.removeTail();
-    if (tailNode && this.cache.delete(tailNode.key)) {
-      console.log(`Evicted key: ${tailNode.key}`);
-      evicted++;
-    } else {
-      console.log(`Failed to evict tail node or key not found in cache.`);
+    if (tailNode) {
+      const deleted = await this.delete(tailNode.key);
+      console.log(`Deleted tail key: ${tailNode.key}. Current size: ${this.cache.size}`);
+      if (!deleted) console.error(`Failed to delete key: ${tailNode.key}`);
     }
-    console.log(`Cache size post deletion: ${this.cache.size}`);
   }
-  console.log(`Evicted ${evicted} items. Final cache size: ${this.cache.size}`);
   }
-  
   
 
   async delete(key: K): Promise<boolean> {
-    if (key === null || key === undefined) {
-      throw new Error("Key must not be null or undefined");
-    }
-
-    const node = this.cache.get(key);
-    if (!node) return false;
-
-    if (node.prev) node.prev.next = node.next;
-    if (node.next) node.next.prev = node.prev;
-    if (node === this.head) this.head = node.next;
-    if (node === this.tail) this.tail = node.prev;
-
-    return this.cache.delete(key);
+  if (key === null || key === undefined) {
+    throw new Error("Key must not be null or undefined");
   }
+
+  const node = this.cache.get(key);
+  if (!node) return false;
+
+  // Remove node from doubly linked list
+  if (node.prev) node.prev.next = node.next;
+  if (node.next) node.next.prev = node.prev;
+
+  // Handle head and tail updates
+  if (node === this.head) this.head = node.next;
+  if (node === this.tail) this.tail = node.prev;
+  if (node === this.head && node === this.tail) {
+    this.head = null;
+    this.tail = null; // Handle single-node scenario
+  }
+
+  // Delete from Map and confirm
+  const result = this.cache.delete(key);
+  console.log(`Deleted key: ${key}, Cache size: ${this.cache.size}`);
+  return result;
+  }
+  
 
   async clear(): Promise<void> {
     this.cache.clear();
