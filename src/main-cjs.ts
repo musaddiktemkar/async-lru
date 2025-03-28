@@ -125,18 +125,23 @@ class AsyncLRUCache<K, V> {
   }
 
   async setMaxKeys(newMaxSize: number): Promise<void> {
-    if (!Number.isInteger(newMaxSize) || newMaxSize <= 0) {
-      throw new Error("newMaxSize must be a positive integer greater than 0");
-    }
+  if (!Number.isInteger(newMaxSize) || newMaxSize <= 0) {
+    throw new Error("newMaxSize must be a positive integer greater than 0");
+  }
 
-    this.maxSize = newMaxSize;
+  // Round the max size to the nearest multiple of 10
+  const roundedMaxSize = Math.round(newMaxSize / 10) * 10;
+  this.maxSize = roundedMaxSize;
 
-    while (this.cache.size > this.maxSize) {
-      const tailNode = this.removeTail();
-      if (tailNode) {
-        this.cache.delete(tailNode.key);
-      }
+  console.log(`maxSize has been updated and rounded to: ${this.maxSize}`);
+
+  // Evict items if the current cache size exceeds the new maxSize
+  while (this.cache.size > this.maxSize) {
+    const tailNode = this.removeTail();
+    if (tailNode) {
+      this.cache.delete(tailNode.key);
     }
+  }
   }
 
   async *keys(): AsyncIterableIterator<K> {
