@@ -45,11 +45,11 @@ class AsyncLRUCache<K, V> {
 
   const tailNode = this.tail;
   if (tailNode.prev) {
-    tailNode.prev.next = null; // Update previous node
+    tailNode.prev.next = null; // Update the previous node's next reference
   } else {
-    this.head = null; // If no previous node, reset head
+    this.head = null; // If there's no previous node, update the head
   }
-  this.tail = tailNode.prev; // Update tail pointer
+  this.tail = tailNode.prev; // Update the tail reference
 
   console.log(`Removed tail node with key: ${tailNode.key}`);
   return tailNode;
@@ -85,20 +85,21 @@ class AsyncLRUCache<K, V> {
     this.moveToHead(newNode);
 
     if (this.cache.size > this.maxSize) {
-      const evictCount = Math.ceil(this.maxSize * 0.1);
+      const evictCount = Math.ceil(this.maxSize * 0.1); // Calculate batch size
       console.log(`Evicting ${evictCount} items from cache (batch size: 10%)...`);
 
       let evicted = 0;
       while (this.cache.size > this.maxSize && evicted < evictCount) {
         const tailNode = this.removeTail();
-        if (tailNode && this.cache.has(tailNode.key) && this.cache.delete(tailNode.key)) {
+        if (tailNode && this.cache.delete(tailNode.key)) {
           console.log(`Evicted key: ${tailNode.key}`);
           evicted++;
         } else {
           console.log(`Failed to evict tail node or key not found in cache.`);
         }
+        console.log(`Cache size post deletion: ${this.cache.size}`);
       }
-      console.log(`Evicted ${evicted} items. Current cache size: ${this.cache.size}`);
+      console.log(`Evicted ${evicted} items. Final cache size: ${this.cache.size}`);
     }
   }
   }
@@ -119,15 +120,17 @@ class AsyncLRUCache<K, V> {
   let evicted = 0;
   while (this.cache.size > this.maxSize && evicted < evictCount) {
     const tailNode = this.removeTail();
-    if (tailNode && this.cache.has(tailNode.key) && this.cache.delete(tailNode.key)) {
+    if (tailNode && this.cache.delete(tailNode.key)) {
       console.log(`Evicted key: ${tailNode.key}`);
       evicted++;
     } else {
       console.log(`Failed to evict tail node or key not found in cache.`);
     }
+    console.log(`Cache size post deletion: ${this.cache.size}`);
   }
-  console.log(`Evicted ${evicted} items. Current cache size: ${this.cache.size}`);
+  console.log(`Evicted ${evicted} items. Final cache size: ${this.cache.size}`);
   }
+  
   
 
   async delete(key: K): Promise<boolean> {
