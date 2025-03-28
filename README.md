@@ -1,6 +1,6 @@
 # AsyncLRUCache
 
-**AsyncLRUCache** is a powerful, asynchronous caching library with support for **Least Recently Used (LRU)** eviction policies, **dynamic resizing**, and **iterator functionality**. With the ability to integrate **custom eviction policies**, this library is highly adaptable for managing memory and optimizing performance in diverse applications. It is compatible with both **CommonJS** and **ES Modules**, making it a versatile solution for modern JavaScript and TypeScript projects.
+**AsyncLRUCache** is a asynchronous caching library with support for **Least Recently Used (LRU)** eviction policies, **dynamic resizing**, and **iterator functionality**. With the ability to integrate **custom eviction policies**, this library is highly adaptable for managing memory and optimizing performance in diverse applications. It is compatible with both **CommonJS** and **ES Modules**, making it a versatile solution for modern JavaScript and TypeScript projects.
 
 ---
 
@@ -177,5 +177,53 @@ class TTLCache<K, V> extends AsyncLRUCache<K, { value: V; expiresAt: number }> {
 
 const ttlCache = new TTLCache<string, string>(5);
 await ttlCache.set('key1', { value: 'value1', expiresAt: Date.now() + 5000 });
+```
+
+## Example Usage Scenarios
+
+### Caching API Responses
+```js
+const apiCache = new AsyncLRUCache(50);
+
+async function fetchApiResponse(url) {
+  if (await apiCache.has(url)) {
+    return await apiCache.get(url);
+  }
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  await apiCache.set(url, data);
+  return data;
+}
+```
+
+### Memoizing Computations
+```js
+const computationCache = new AsyncLRUCache(20);
+
+async function expensiveComputation(input) {
+  if (await computationCache.has(input)) {
+    return await computationCache.get(input);
+  }
+
+  const result = await performComputation(input);
+  await computationCache.set(input, result);
+  return result;
+}
+```
+
+## Error Handling
+
+### Invalid Keys
+An error is thrown when attempting to use `null` or `undefined` keys:
+```js
+await cache.set(null, 'value'); // Throws: "Key must not be null or undefined"
+```
+
+### Invalid Cache Sizes
+An error is thrown if `setMaxKeys` is given a non-positive integer:
+```js
+await cache.setMaxKeys(0); // Throws: "newMaxSize must be a positive integer greater than 0"
 ```
 
