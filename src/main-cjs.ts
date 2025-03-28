@@ -86,14 +86,18 @@ class AsyncLRUCache<K, V> {
     if (this.cache.size > this.maxSize) {
       // Calculate batch eviction size
       const evictCount = Math.ceil(this.maxSize * 0.1);
+      console.log(`Evicting ${evictCount} items from cache...`);
 
       // Remove least recently used items in batches
-      for (let i = 0; i < evictCount && this.cache.size > this.maxSize; i++) {
+      let evicted = 0;
+      while (this.cache.size > this.maxSize && evicted < evictCount) {
         const tailNode = this.removeTail();
         if (tailNode) {
           this.cache.delete(tailNode.key);
+          evicted++;
         }
       }
+      console.log(`Evicted ${evicted} items. Current cache size: ${this.cache.size}`);
     }
   }
   }
@@ -145,15 +149,19 @@ class AsyncLRUCache<K, V> {
 
   // Evict items in batches of 10% if the cache size exceeds the new maxSize
   const evictCount = Math.ceil(this.maxSize * 0.1);
-  while (this.cache.size > this.maxSize) {
-    for (let i = 0; i < evictCount && this.cache.size > this.maxSize; i++) {
-      const tailNode = this.removeTail();
-      if (tailNode) {
-        this.cache.delete(tailNode.key);
-      }
+  console.log(`Starting batch eviction for resizing. Evicting ${evictCount} items...`);
+
+  let evicted = 0;
+  while (this.cache.size > this.maxSize && evicted < evictCount) {
+    const tailNode = this.removeTail();
+    if (tailNode) {
+      this.cache.delete(tailNode.key);
+      evicted++;
     }
   }
+  console.log(`Evicted ${evicted} items. Current cache size: ${this.cache.size}`);
   }
+  
 
   async *keys(): AsyncIterableIterator<K> {
     for (let current = this.head; current !== null; current = current.next) {
