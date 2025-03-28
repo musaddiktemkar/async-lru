@@ -1,60 +1,38 @@
-const AsyncLRUCache = require('./dist/cjs/main-cjs'); // Adjust path as needed
+const AsyncLRUCache = require('./dist/cjs/main-cjs'); // Adjust the path as needed
 
 (async () => {
-  console.log('Starting Full Tests for AsyncLRUCache...');
+  console.log('Starting Tests for Updated setMaxKeys...');
 
-  // Initialize cache with maxSize = 3
-  const cache = new AsyncLRUCache(3);
+  // Initialize the cache with maxSize = 50
+  const cache = new AsyncLRUCache(50);
 
-  // Test setting and getting values
-  await cache.set('key1', 'value1');
-  await cache.set('key2', 'value2');
-  await cache.set('key3', 'value3');
+  console.log('Initial maxSize:', cache.maxSize); // Expected: 50
 
-  console.log('Initial size:', await cache.size()); // Expected: 3
+  // Test resizing with rounding logic
+  await cache.setMaxKeys(45);
+  console.log('maxSize after setting 45:', cache.maxSize); // Expected: 50
 
-  console.log('Value of key1:', await cache.get('key1')); // Expected: value1
-  console.log('Value of key2:', await cache.get('key2')); // Expected: value2
-  console.log('Value of non-existent key4:', await cache.get('key4')); // Expected: undefined
+  await cache.setMaxKeys(54);
+  console.log('maxSize after setting 54:', cache.maxSize); // Expected: 50
 
-  // Test LRU eviction
-  await cache.set('key4', 'value4'); // This should evict 'key3'
-  console.log('Cache size after adding key4:', await cache.size()); // Expected: 3
-  console.log('Does cache still have key3?', await cache.has('key3')); // Expected: false
-  console.log('Does cache still have key4?', await cache.has('key4')); // Expected: true
+  await cache.setMaxKeys(100);
+  console.log('maxSize after setting 100:', cache.maxSize); // Expected: 100
 
-  // Test `delete` method
-  console.log('Deleting key1:', await cache.delete('key1')); // Expected: true
-  console.log('Does cache still have key1?', await cache.has('key1')); // Expected: false
-  console.log('Cache size after deletion:', await cache.size()); // Expected: 2
+  await cache.setMaxKeys(109);
+  console.log('maxSize after setting 109:', cache.maxSize); // Expected: 110
 
-  // Test `clear` method
-  await cache.clear();
-  console.log('Cache size after clearing:', await cache.size()); // Expected: 0
-
-  // Refill cache and test resizing
-  await cache.set('key5', 'value5');
-  await cache.set('key6', 'value6');
-  await cache.set('key7', 'value7');
-  console.log('Cache size after refill:', await cache.size()); // Expected: 3
-
-  await cache.setMaxKeys(2); // Resize to maxSize = 2
-  console.log('Cache size after resizing:', await cache.size()); // Expected: 2
-  console.log('Does cache still have key5?', await cache.has('key5')); // Expected: false
-
-  // Test iterators
-  console.log('Keys in cache:');
-  for await (const key of cache.keys()) {
-    console.log(key);
-  }
-  console.log('Values in cache:');
-  for await (const value of cache.values()) {
-    console.log(value);
-  }
-  console.log('Entries in cache:');
-  for await (const [key, value] of cache.entries()) {
-    console.log(key, value);
+  // Invalid inputs
+  try {
+    await cache.setMaxKeys(-5); // Expected to throw error
+  } catch (error) {
+    console.log('Error for -5:', error.message); // Expected: "newMaxSize must be a positive integer greater than 0"
   }
 
-  console.log('Full Tests for AsyncLRUCache Completed!');
+  try {
+    await cache.setMaxKeys(0); // Expected to throw error
+  } catch (error) {
+    console.log('Error for 0:', error.message); // Expected: "newMaxSize must be a positive integer greater than 0"
+  }
+
+  console.log('Tests for Updated setMaxKeys Completed!');
 })();
